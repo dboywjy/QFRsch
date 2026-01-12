@@ -192,7 +192,7 @@ QFRsch v0.2:
 - 横截面因子
 	- $R_{i,t}​=\alpha + \beta_1 \times Value_{i,t} ​+ \beta_{2} \times Momentum_{i,t} ​+ \cdots + \varepsilon_{i,t}​$
 - 时序因子
-	- $R_t = \alpha + \beta_1 \cdot \text{GDP\_growth}_t + \beta_2 \cdot \text{Inflation}_t + \dots + \varepsilon_t$
+	- $R_t = \alpha + \beta_1 \cdot \text{GDP-growth}_t + \beta_2 \cdot \text{Inflation}_t + \dots + \varepsilon_t$
 
 | 维度   | 横截面因子                    | 时序因子                 |
 | ---- | ------------------------ | -------------------- |
