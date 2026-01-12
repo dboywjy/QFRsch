@@ -74,7 +74,7 @@ debugInConsole: false # Print debug info in Obsidian console
 | 收益率  | 年化收益率          | 因子换手率分析                                                        |
 |      | 超额年化收益率        | 策略相对基准胜率                                                       |
 |      | 收益率的显著性检验      | Newey-West 调整消除残差异方差与自相关性                                      |
-| 波动率  | 年化波动率          | Fama-Macbeth 回归排除残差在截面上的相关性对标准误的影响                             |
+| 波动率  | 年化波动率          | Fama-Macbeth 回归                             |
 |      | 超额年化波动率        | 因子收益率的风险调整                                                     |
 | 夏普比率 | 夏普比率           | 序贯排序双分组                                                        |
 | 信息比率 | 信息比率           | Bybee, Kelly常用的IPCA(Instrumented Principal Component Analysis) |
