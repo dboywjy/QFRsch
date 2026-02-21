@@ -9,3 +9,8 @@ dependencies = [
     "pandas>=3.0.1",
     "pandas-market-calendars>=5.3.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
