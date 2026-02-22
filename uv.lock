@@ -660,6 +660,8 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "ipykernel" },
+    { name = "pyarrow" },
+    { name = "wrds" },
 ]
 
 [package.dev-dependencies]
@@ -669,7 +671,11 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ipykernel", specifier = ">=7.1.0" }]
+requires-dist = [
+    { name = "ipykernel", specifier = ">=7.1.0" },
+    { name = "pyarrow", specifier = ">=23.0.0" },
+    { name = "wrds", specifier = ">=3.4.0" },
+]
 
 [package.metadata.requires-dev]
 dev = [
