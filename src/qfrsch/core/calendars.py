@@ -384,8 +384,7 @@ def get_quarter_end(date_obj: Union[str, date]) -> date:
     """
     ts = pd.Timestamp(date_obj)
     quarter_month = ts.quarter * 3
-    return ts.replace(month=quarter_month, day=1).date() + timedelta(days=32)
-    # Add 32 days then get last day to handle month-end correctly
+    return (pd.Timestamp(year=ts.year, month=quarter_month, day=1) + pd.offsets.MonthEnd(0)).date()
 
 
 def get_year_start(date_obj: Union[str, date]) -> date:

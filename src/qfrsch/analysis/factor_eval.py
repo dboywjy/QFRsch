@@ -57,13 +57,13 @@ def calculate_ic(
         factor_row = factor_aligned.loc[date]
         returns_row = returns_aligned.loc[date]
         
-        # Remove NaN values
-        valid_mask = ~(factor_row.isna() | returns_row.isna())
-        if valid_mask.sum() < 2:
+        # Align to common tickers, then remove NaN values
+        common_tickers = factor_row.dropna().index.intersection(returns_row.dropna().index)
+        if len(common_tickers) < 2:
             continue
         
-        factor_clean = factor_row[valid_mask]
-        returns_clean = returns_row[valid_mask]
+        factor_clean = factor_row.loc[common_tickers]
+        returns_clean = returns_row.loc[common_tickers]
         
         if method == 'spearman':
             ic_value = stats.spearmanr(factor_clean, returns_clean)[0]
@@ -199,13 +199,13 @@ def quantile_backtest(
         factor_row = factor_aligned.loc[date]
         returns_row = returns_aligned.loc[date]
         
-        # Remove NaN values
-        valid_mask = ~(factor_row.isna() | returns_row.isna())
-        if valid_mask.sum() < num_quantiles:
+        # Align to common tickers, then remove NaN values
+        common_tickers = factor_row.dropna().index.intersection(returns_row.dropna().index)
+        if len(common_tickers) < num_quantiles:
             continue
         
-        factor_clean = factor_row[valid_mask]
-        returns_clean = returns_row[valid_mask]
+        factor_clean = factor_row.loc[common_tickers]
+        returns_clean = returns_row.loc[common_tickers]
         
         # Create quantile labels
         quantile_labels = pd.qcut(factor_clean, q=num_quantiles, labels=False, duplicates='drop')
@@ -214,7 +214,7 @@ def quantile_backtest(
         for q in range(num_quantiles):
             quantile_mask = quantile_labels == q
             if quantile_mask.sum() > 0:
-                avg_ret = returns_clean[quantile_mask].mean()
+                avg_ret = returns_clean.loc[quantile_mask].mean()
             else:
                 avg_ret = np.nan
             
