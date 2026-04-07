@@ -5,16 +5,22 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "ipykernel>=7.2.0",
     "numpy>=2.4.2",
     "pandas>=3.0.1",
     "pandas-market-calendars>=5.3.0",
     "plotly>=6.5.2",
+    "pyarrow>=23.0.1",
     "scikit-learn>=1.8.0",
     "statsmodels>=0.14.6",
+    "tqdm>=4.67.3",
+    "wrds>=3.1.6",
     "xgboost>=3.2.0",
 ]
 
 [dependency-groups]
 dev = [
+    "bt>=1.1.4",
     "pytest>=9.0.2",
+    "wrds>=3.1.6",
 ]

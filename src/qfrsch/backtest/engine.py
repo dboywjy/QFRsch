@@ -170,6 +170,18 @@ class SimpleEngine:
         
         # Extract all unique tickers from target_weights_df columns
         self.tickers = sorted(self.target_weights_df.columns.tolist())
+        
+        # Build price lookup cache: {(date, ticker): price} for fast access
+        self._price_cache = {}
+        price_col = self.config.execution_price.lower()
+        if price_col not in self.ohlcv_df.columns:
+            price_col = 'close'
+        ohlcv_subset = self.ohlcv_df[self.ohlcv_df['ticker'].isin(self.tickers)]
+        dates_normalized = ohlcv_subset.index.normalize()
+        tickers = ohlcv_subset['ticker'].values
+        prices = ohlcv_subset[price_col].values
+        for i in range(len(ohlcv_subset)):
+            self._price_cache[(dates_normalized[i], tickers[i])] = float(prices[i])
     
     def _simulate(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
@@ -200,7 +212,7 @@ class SimpleEngine:
         # State variables
         cash = self.config.initial_capital
         holdings = {ticker: 0.0 for ticker in self.tickers}  # Current shares held
-        previous_prices = {ticker: 0.0 for ticker in self.tickers}  # Last execution price
+        previous_prices = {ticker: 0.0 for ticker in self.tickers}  # Last known price per ticker
         
         # Get execution price column
         price_col = self.config.execution_price.lower()
@@ -215,9 +227,19 @@ class SimpleEngine:
             if date_prices is None or not date_prices:
                 continue
             
-            # Step 1: Calculate portfolio value change from price movements
-            position_value = sum(holdings.get(ticker, 0.0) * date_prices.get(ticker, 0.0) 
-                                for ticker in self.tickers)
+            # Update previous_prices with any new data; carry forward for missing tickers
+            for ticker in self.tickers:
+                if ticker in date_prices:
+                    previous_prices[ticker] = date_prices[ticker]
+            
+            # Step 1: Calculate portfolio value using best-known prices
+            # Use today's price if available, otherwise last known price
+            position_value = 0.0
+            for ticker in self.tickers:
+                qty = holdings.get(ticker, 0.0)
+                if abs(qty) > 1e-10:
+                    price = date_prices.get(ticker, previous_prices.get(ticker, 0.0))
+                    position_value += qty * price
             total_value = cash + position_value
             
             # Record daily state before rebalancing
@@ -241,10 +263,16 @@ class SimpleEngine:
             target_weights = self._get_target_weights(date)
             
             # Step 3: Calculate target quantities
+            # Only trade tickers that have a real price today
             target_quantities = {}
             for ticker in self.tickers:
                 target_weight = target_weights.get(ticker, 0.0)
-                target_quantities[ticker] = (target_weight * total_value) / max(date_prices.get(ticker, 1.0), 0.001)
+                price = date_prices.get(ticker, 0.0)
+                if price > 0.001:
+                    target_quantities[ticker] = (target_weight * total_value) / price
+                else:
+                    # No price available — keep current position unchanged
+                    target_quantities[ticker] = holdings.get(ticker, 0.0)
             
             # Step 4: Calculate position changes and transaction costs
             turnover = 0.0
@@ -255,6 +283,8 @@ class SimpleEngine:
                 
                 if abs(qty_change) > 1e-8:  # Skip negligible changes
                     exec_price = date_prices.get(ticker, 0.0)
+                    if exec_price < 0.001:
+                        continue  # Cannot trade without a price
                     
                     # Apply slippage
                     if qty_change > 0:  # Buying
@@ -300,7 +330,7 @@ class SimpleEngine:
     
     def _get_prices_for_date(self, date: pd.Timestamp, price_col: str) -> Optional[Dict[str, float]]:
         """
-        Extract prices for all tickers on a given date.
+        Extract prices for all tickers on a given date using cached lookup.
         
         Parameters
         ----------
@@ -315,19 +345,12 @@ class SimpleEngine:
             Dictionary mapping {ticker: price}. None if no data found.
         """
         
-        try:
-            date_data = self.ohlcv_df.loc[self.ohlcv_df.index.normalize() == date.normalize()]
-        except Exception:
-            return None
-        
-        if date_data.empty:
-            return None
-        
+        date_norm = date.normalize()
         prices = {}
         for ticker in self.tickers:
-            ticker_data = date_data[date_data['ticker'] == ticker]
-            if not ticker_data.empty and price_col in ticker_data.columns:
-                prices[ticker] = float(ticker_data[price_col].iloc[0])
+            price = self._price_cache.get((date_norm, ticker))
+            if price is not None:
+                prices[ticker] = price
         
         return prices if prices else None
     

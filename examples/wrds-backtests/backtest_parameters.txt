@@ -1,0 +1,53 @@
+file	:	backtesterplus
+beg_d	:	01
+beg_m	:	Jan
+datef	:	YYMMDDd10.
+end_d	:	01
+end_m	:	Jan
+Weight	:	%str()
+beg_yr	:	2019
+end_yr	:	2022
+format	:	csv
+method	:	1
+Buckets	:	5
+PostRet	:	FFXRET
+RankVar	:	momentum12
+library	:	wrdsapps
+compress	:	
+qdatevar	:	fdate
+wrdsversion	:	3
+query_form_page_id	:	5477
+source_saved_query	:	
+data_dictionary_table	:	signals_raw_plus
+query_form_is_preview	:	false
+query_form_environment	:	[WRDS Prod wrds-pub2-w] 
+data_dictionary_product	:	wrdsapps_backtest_plus
+query_form_page_revision	:	86740
+
+
+Reults:
+WRDS Quantitative Factors Platform
+Strategy Backtest
+Signal Name momentum12
+Signal Description 12-Month Momentum
+Benchmark WRDS US Stock Market Index
+Active Return 4-Factor
+Time Period 01Jan2019 - 01Jan2022
+Signal Neutral to b_mkt b_smb FFI48
+------------------------------ ------------------------------ -------------------- --------------------
+Return, Annual Risk, Annual Sharpe Ratio
+Portfolio 1: Short 23.47% 36.70% 0.640
+Portfolio 2 18.84% 27.14% 0.694
+Portfolio 3 11.67% 24.00% 0.487
+Portfolio 4 14.12% 21.83% 0.647
+Portfolio 5: Long 19.13% 26.19% 0.730
+Portfolio [5 - 1] -4.34% 15.25% -0.285
+Long-Only Portfolio 18.43% 28.42% -0.153
+Benchmark Portfolio 19.94% 18.29% -0.238
+Signal-Weighted Portfolio -6.87% 12.42% -0.554
+Information Ratio - IR -0.120
+Information Coefficient - IC -0.73%
+Maximum Drawdown -34.43%
+Portfolio Turnover 540%
+------------------------------ ------------------------------ -------------------- --------------------
+
